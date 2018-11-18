@@ -58,24 +58,27 @@ def k_means_vectorized(features, k = 6, num_iters = 100):
 
 def main():
 	words = []
-	with open('1-1000.txt', 'r') as f:
+	with open('song_words.txt', 'r') as f:
 		for line in f:
 			words.append(line.strip())
 
 	all_tracks = []
-	for _ in range(40):
+	for _ in range(200):
 		word = words.pop(random.randint(0, len(words)-1))
-		num_songs = 50
+		num_songs = 10
 		offset_max = 300
 		tracks = None
 		while not tracks:
 			try:
-				tracks = sp.search(q=word, limit=num_songs, offset=random.randint(0, offset_max), type='track')['tracks']['items']
+				offset_idx = random.randint(0, offset_max)
+				tracks = sp.search(q=word, limit=num_songs, offset=offset_idx, type='track')['tracks']['items']
+				# print(word)
+				# print(offset_idx)
+				# print([(t['name'], t['popularity']) for t in tracks])
 			except:
-				print(offset_max)
 				offset_max = max(0, offset_max - 100)
 				if offset_max < 100:
-					limit -= 10
+					num_songs -= 1
 
 		all_tracks.extend(tracks)
 
@@ -111,17 +114,16 @@ def main():
 	# std = np.std(storage_map.values())
 
 
-	
-	# mini = min(storage_map.values())
-	# maxi = max(storage_map.values())
-	# print('min: {}, max:{}'.format(mini, maxi))
 
-	# for key, val in storage_map.iteritems():
-	# 	if maxi == mini: print('std is 0!!!!!!!!!!!!!!!!!!!!!')
-	# 	else: storage_map[key] = 100*((val - mini)/float(maxi - mini))
-	# print('normalized map: {}'.format(storage_map))
+	mini = min(storage_map.values())
+	maxi = max(storage_map.values())
+	print('min: {}, max:{}'.format(mini, maxi))
 
-		# if assignments[a] not in storage_map: storage_map[assignments[a]] = (popularities[a], centroids[assignments[a]])
+	for key, val in storage_map.iteritems():
+		if maxi == mini: print('std is 0!!!!!!!!!!!!!!!!!!!!!')
+		else: storage_map[key] = 100*((val - mini)/float(maxi - mini))
+	print('normalized map: {}'.format(storage_map))
+	if assignments[a] not in storage_map: storage_map[assignments[a]] = (popularities[a], centroids[assignments[a]])
 
 
 	# RUN TESTING
