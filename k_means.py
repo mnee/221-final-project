@@ -1,6 +1,6 @@
 import numpy as np
 
-""" 
+"""
     Args:
         features - Array of N features vectors. Each row represents a feature
             vector.
@@ -25,6 +25,8 @@ def k_means_vectorized(features, k = 6, num_iters = 100):
         means = np.asarray([np.array([]) for i in range(k)])
         feat = np.repeat(features, (k), axis = 0)
         cent_init = np.tile(centers, (len(features), 1))
+        # print('cent_init:{}, \n feat:{}'.format(cent_init.shape, feat.shape))
+        # print('cent_type:{}, new type:{}'.format(type(cent_init[0, 0]), type(cent_init[0, 13])))
         diff = np.linalg.norm(cent_init - feat, axis = 1).reshape(N, k)
         assignments = np.argmin(diff, axis = 1)
         for i in range(k):

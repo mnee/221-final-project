@@ -22,26 +22,28 @@ class SpotifyDataLoader:
 				words.append(line.strip())
 		return words
 
-	def load_song_data(self, num_songs=10, num_iters=200, offset_max=300):
+	def load_song_data(self, num_songs=20, num_iters=500, offset_max=300):
 		words = self.load_search_words()
 
 		# Clear it out if already loaded
 		self.all_track_data = []
 		for i in range(num_iters):
+			print("Iteration {} of {}".format(i, num_iters))
+			offset_max_temp, num_songs_temp = offset_max, num_songs
 			try:
 				word = words.pop(random.randint(0, len(words)-1))
 				print(word)
 				tracks = None
 				while not tracks:
-					print("Offset is {}. Num_songs is {}.".format(offset_max, num_songs))
+					print("Offset is {}. Num_songs is {}.".format(offset_max_temp, num_songs_temp))
 					try:
-						offset_idx = random.randint(0, offset_max)
-						tracks = self.sp.search(q=word, limit=num_songs, offset=offset_idx, type='track')['tracks']['items']
+						offset_idx = random.randint(0, offset_max_temp)
+						tracks = self.sp.search(q=word, limit=num_songs_temp, offset=offset_idx, type='track')['tracks']['items']
 					except:
-						offset_max = max(0, offset_max - 50)
-						if offset_max == 0:
-							if num_songs > 0:
-								num_songs -= 1
+						offset_max_temp = max(0, offset_max_temp - 50)
+						if offset_max_temp == 0:
+							if num_songs_temp > 0:
+								num_songs_temp -= 1
 							else:
 								break
 			except:
@@ -59,12 +61,14 @@ class SpotifyDataLoader:
 				 f['instrumentalness'], f['danceability'], f['duration_ms'], f['valence']])
 			return X, popularity
 		print("Error failed to load features of song {}".format(uri))
-		return None, None
+		return np.array([]), -1
 
-	def get_all_features(self):
+
+	# NOTE: Now broken due to messing around with get_features
+	def get_all_features(self, track_data):
 		featureVec = np.array([[]])
 		popularities = []
-		for i, song in enumerate(self.all_track_data):
+		for i, song in enumerate(track_data):
 			print('iteration {}'.format(i))
 			X, popularity = self.get_features(song)
 			if popularity != None:
